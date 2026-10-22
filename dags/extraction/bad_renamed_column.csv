@@ -1,0 +1,2 @@
+order_id,customer_id,order_date,total,status
+1001,C001,2026-01-05,129.99,completed

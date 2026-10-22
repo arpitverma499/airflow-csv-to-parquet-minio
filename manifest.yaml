@@ -1,0 +1,16 @@
+dataset_name: orders            # TODO: rename to the real DHAP-34 dataset name
+ticket: DHAP-42
+related_tickets: [DHAP-34]
+description: Orders dataset ingested from CSV into a partitioned Parquet lake in MinIO.
+owner: arpit-verma
+status: draft                   # draft | in-review | active
+source:
+  type: csv
+  path: dags/extraction/sample.csv
+destination:
+  type: minio
+  bucket: datalake              # created on startup by the minio-init container
+  prefix: orders
+  format: parquet
+  partitioning: hive            # datalake/orders/order_month=YYYY-MM/part-0.parquet
+contract: schema_contract.yaml

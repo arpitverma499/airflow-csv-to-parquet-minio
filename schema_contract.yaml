@@ -1,0 +1,21 @@
+# Contract enforced at runtime by the validate_contract task.
+# Any violation fails the DAG before anything is written to MinIO.
+# TODO: replace the columns below with the real DHAP-34 dataset columns.
+dataset: orders
+version: 1
+strict_columns: true      # unexpected extra columns also fail the run
+min_rows: 1
+
+columns:
+  # types: string | integer | float | boolean | date (YYYY-MM-DD) | timestamp (ISO 8601)
+  # optional rules: unique, min, max, allowed: [...], regex
+  - {name: order_id,    type: integer, nullable: false, unique: true, min: 1}
+  - {name: customer_id, type: string,  nullable: false, regex: '^C\d{3,}$'}
+  - {name: order_date,  type: date,    nullable: false}
+  - {name: amount,      type: float,   nullable: false, min: 0}
+  - {name: status,      type: string,  nullable: false, allowed: [completed, pending, cancelled]}
+
+partition:
+  source_column: order_date   # must be a non-nullable date/timestamp column
+  column: order_month         # derived column used as the Hive partition key
+  granularity: month          # year | month | day
