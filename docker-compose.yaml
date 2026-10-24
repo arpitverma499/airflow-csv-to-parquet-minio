@@ -62,34 +62,21 @@ services:
         condition: service_completed_successfully
     restart: unless-stopped
 
-  minio:
-    image: minio/minio:latest        # pin a RELEASE.* tag once you pick one
+    minio:
+    image: cgr.dev/chainguard/minio:latest
+    user: root
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     ports:
-      - "9000:9000"    # S3 API
-      - "9001:9001"    # console
+      - "9000:9000"
+      - "9001:9001"
     volumes:
       - minio-data:/data
     restart: unless-stopped
 
-  minio-init:                        # creates the target bucket, then exits
-    image: minio/mc:latest
-    depends_on:
-      - minio
-    environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-      MINIO_BUCKET: ${MINIO_BUCKET}
-    entrypoint: >
-      /bin/sh -c "
-      until mc alias set local http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD; do sleep 2; done;
-      mc mb --ignore-existing local/$$MINIO_BUCKET;
-      exit 0;
-      "
-
 volumes:
   postgres-data:
   minio-data:
+  

@@ -210,7 +210,8 @@ def csv_to_parquet_minio():
         contract = load_contract()
         conn = BaseHook.get_connection(MINIO_CONN_ID)
         scheme, _, host = conn.extra_dejson["endpoint_url"].partition("://")
-        s3 = fs.S3FileSystem(access_key=conn.login, secret_key=conn.password, endpoint_override=host, scheme=scheme)
+        s3 = fs.S3FileSystem(access_key=conn.login, secret_key=conn.password, endpoint_override=host, scheme=scheme, allow_bucket_creation=True)
+        s3.create_dir(BUCKET)
 
         table = pq.read_table(staging_path)
         pcol = contract["partition"]["column"]
